@@ -1,6 +1,6 @@
 # CloudProyecto
 # Ejecución del proyecto
-## Crear de venv
+## Crear ambiente venv
 ```
 py -3 -m venv venv
 ```
