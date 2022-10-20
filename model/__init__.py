@@ -1,3 +1,3 @@
 from .model import db;
-from .userModel import User;
-from .taskModel import Task;
+from .userModel import User,UserModelSchema;
+from .taskModel import Task,TaskModelSchema;

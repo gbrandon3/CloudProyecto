@@ -10,11 +10,12 @@ class Task(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     timestmap=db.Column(db.String(50),primary_key=True)
     file=db.Column(db.String(50),)
-    
+    newExtension=db.Column(db.String(7))
+    user= db.Column(db.String, db.ForeignKey('user.username'))
     status=db.Column(db.Enum(FileStatus))
 
 
-class TaskSchema(SQLAlchemyAutoSchema):
+class TaskModelSchema(SQLAlchemyAutoSchema):
   
 
     class Meta:
