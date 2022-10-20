@@ -8,3 +8,5 @@ venv.bak/
 __pycache__/
 .vs
 vs/
+uploads/uploaded/*
+uploaded/processed/*

@@ -7,19 +7,24 @@ class FileStatus(enum.Enum):
     UPLOADED = 1
     PROCESSED = 2
 class Task(db.Model):
-    id=db.Column(db.Integer, primary_key=True)
-    timestmap=db.Column(db.String(50),primary_key=True)
+    id=db.Column(db.Integer, primary_key=True,autoincrement=True)
+    timestmap=db.Column(db.String(50))
     file=db.Column(db.String(50),)
     newExtension=db.Column(db.String(7))
     user= db.Column(db.String, db.ForeignKey('user.username'))
     status=db.Column(db.Enum(FileStatus))
 
+class EnumADiccionario(fields.Field):
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value is None:
+            return None
+        return {"key": value.name, "value": value.value}
 
 class TaskModelSchema(SQLAlchemyAutoSchema):
   
-
+    status=EnumADiccionario(attribute=("status"))
     class Meta:
-        __tablename__ = "tasks"
+       
         model = Task
         include_relationships = True
         include_fk = True
