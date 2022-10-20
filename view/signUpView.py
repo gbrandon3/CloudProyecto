@@ -1,0 +1,22 @@
+
+from sqlite3 import IntegrityError
+from flask import request
+
+from flask import request
+from flask_restful import Resource
+
+from model import User,db
+class SignUpView(Resource):
+
+    def post(self):
+        user=User(username=request.json["username"],email=request.json["email"],password=request.json["password1"])
+        db.session.add(user)
+        try:
+            db.session.commit()
+        except IntegrityError  as Error:
+            db.session.rollback()
+            return "El usuario no pudo ser creado",409
+        
+        return "Se creo el usuario correctamente"
+        
+
