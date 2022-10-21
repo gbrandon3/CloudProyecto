@@ -9,7 +9,7 @@ from view import SignUpView, SignInView, TaskView,TasksView
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:gbrandon@localhost:5432/Cloud'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@postgres:5432/Cloud'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = 'frase-secreta'
