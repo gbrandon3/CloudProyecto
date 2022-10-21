@@ -1,7 +1,8 @@
 import os
+import sys
 from datetime import datetime
 
-from flask import request
+from flask import request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
@@ -67,3 +68,11 @@ class TasksView(Resource):
 
         else:
             return "Usuario no encontrado", 404
+
+
+class TaskViewFile(Resource):
+
+    def get(self, file_name):
+        print("Ruta:" + os.getcwd(), file=sys.stderr)
+        path = os.getcwd() + '/data/'
+        return send_from_directory(path, file_name, as_attachment=True)
