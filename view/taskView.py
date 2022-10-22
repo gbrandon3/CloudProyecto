@@ -20,8 +20,13 @@ class TaskView(Resource):
 
     @jwt_required()
     def delete(self, id_task):
-        Task.query.filter(Task.id == id_task).delete();
-        db.session.commit()
+        identity = get_jwt_identity()
+        user = User.query.get_or_404(identity)
+        if user is not None:
+            Task.query.filter(Task.id == id_task).delete();
+            db.session.commit()
+        else:
+            return "Usuario no encontrado", 404
 
 
 class TasksView(Resource):
@@ -72,7 +77,17 @@ class TasksView(Resource):
 
 class TaskViewFile(Resource):
 
+    @jwt_required()
     def get(self, file_name):
-        print("Ruta:" + os.getcwd(), file=sys.stderr)
-        path = os.getcwd() + '/data/'
-        return send_from_directory(path, file_name, as_attachment=True)
+        identity = get_jwt_identity()
+        user = User.query.get_or_404(identity)
+        if user is not None:
+            task = Task.query.filter(Task.user == user.username, Task.file == file_name).first()
+            print(task.status, file=sys.stderr)
+            print("Ruta:" + os.getcwd(), file=sys.stderr)
+            root = os.getcwd()
+            path = '/uploads/uploaded/' if task.status == FileStatus.UPLOADED else '/process/process/'
+            print("llego:", file=sys.stderr)
+            return send_from_directory(root + path, file_name, as_attachment=True)
+        else:
+            return "Usuario no encontrado", 404

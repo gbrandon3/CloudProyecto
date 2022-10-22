@@ -26,8 +26,11 @@ services:
     ports:
       - "8000:5000"
     volumes:
-      - upload_files:/cloud/data
+      - upload_files:/cloud/uploads/uploaded
+      - process_files:/cloud/process/process
     depends_on:
       - postgres
 volumes:
   upload_files:
+  process_files:
+
