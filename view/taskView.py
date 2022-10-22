@@ -23,8 +23,16 @@ class TaskView(Resource):
         identity = get_jwt_identity()
         user = User.query.get_or_404(identity)
         if user is not None:
-            Task.query.filter(Task.id == id_task).delete();
-            db.session.commit()
+            task=Task.query.filter(Task.id == id_task)
+
+            if(task.first()!=None):
+        
+                task.delete();
+                db.session.commit()
+            
+                return "Tarea eliminada correctamente",200
+            else:
+                return "Tarea no encontrada",400
         else:
             return "Usuario no encontrado", 404
 

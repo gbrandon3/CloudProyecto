@@ -6,6 +6,7 @@ from model import User,db
 class SignInView(Resource):
 
     def post(self):
+    
         user = User.query.filter(User.username == request.json["username"],
                                        User.password == request.json["password"]).first()
         db.session.commit()
