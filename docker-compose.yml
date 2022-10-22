@@ -24,10 +24,13 @@ services:
   app:
     build: .
     ports:
-      - "8000:5000"
+      - "5000:5000"
     volumes:
+      - .:/cloud
       - upload_files:/cloud/uploads/uploaded
       - process_files:/cloud/process/process
+    environment:
+      FLASK_DEBUG: True
     depends_on:
       - postgres
 volumes:

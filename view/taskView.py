@@ -34,23 +34,23 @@ class TasksView(Resource):
 
     @jwt_required()
     def post(self):
-        identity = get_jwt_identity()
-        user = User.query.get_or_404(identity)
-        if (user != None):
-
-            fileUploaded = request.files["fileName"]
-
-            fileName = secure_filename(fileUploaded.filename)
-
-            user.tasks.append(
-                Task(timestmap=datetime.now(), file=fileName, newExtension=request.values.get('newFormat'),
-                     status=FileStatus.UPLOADED))
-            db.session.commit()
-            try:
-                fileUploaded.save(os.path.join("uploads/uploaded", fileName))
-            except:
-                return "No se pudo guardar el archivo", 500
-            return "Se ha creado la tarea exitosamente"
+        identity=get_jwt_identity()
+        user=User.query.get_or_404(identity)
+        if(user!=None):
+          
+            fileUploaded=request.files["fileName"]
+       
+            fileName=secure_filename(fileUploaded.filename)
+            if(fileName.split(".")[1]in self.extensionAllowed):
+                user.tasks.append(Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED))
+                db.session.commit()
+                try:
+                    fileUploaded.save(os.path.join("uploads/uploaded", fileName))
+                except: 
+                    return "No se pudo guardar el archivo",500
+                return "Se ha creado la tarea exitosamente"
+            else:
+                return "Archivo no valido"
         else:
             return "Usuario no encontrado", 404
 
