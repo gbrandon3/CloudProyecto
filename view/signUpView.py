@@ -10,10 +10,12 @@ class SignUpView(Resource):
 
     def post(self):
         user=User(username=request.json["username"],email=request.json["email"],password=request.json["password1"])
-        db.session.add(user)
+       
         try:
+            db.session.add(user)
             db.session.commit()
-        except IntegrityError  as Error:
+        except:
+    
             db.session.rollback()
             return "El usuario no pudo ser creado",409
         
