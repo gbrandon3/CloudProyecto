@@ -9,6 +9,9 @@ from model import User,db
 class SignUpView(Resource):
 
     def post(self):
+        if(request.json["password1"]!= request.json["password2"]):
+            return "El usuario no puedo ser creado",409
+        
         user=User(username=request.json["username"],email=request.json["email"],password=request.json["password1"])
        
         try:
@@ -19,6 +22,6 @@ class SignUpView(Resource):
             db.session.rollback()
             return "El usuario no pudo ser creado",409
         
-        return "Se creo el usuario correctamente"
+        return "Se creo el usuario orrectamente"
         
 

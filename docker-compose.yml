@@ -25,5 +25,9 @@ services:
     build: .
     ports:
       - "5000:5000"
+    volumes:
+      - .:/cloud
+    environment:
+      FLASK_DEBUG: True
     depends_on:
       - postgres
