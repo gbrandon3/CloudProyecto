@@ -94,11 +94,7 @@ class TaskViewFile(Resource):
         user = User.query.get_or_404(identity)
         if user is not None:
             task = Task.query.filter(Task.user == user.username, Task.file == file_name).first()
-            print(task.status, file=sys.stderr)
-            print("Ruta:" + os.getcwd(), file=sys.stderr)
-            root = os.getcwd()
-            path = '/uploads/uploaded/' if task.status == FileStatus.UPLOADED else '/process/process/'
-            print("llego:", file=sys.stderr)
-            return send_from_directory(root + path, file_name, as_attachment=True)
+            rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
+            return send_from_directory(rutaUsuario, file_name, as_attachment=True)
         else:
             return "Usuario no encontrado", 404

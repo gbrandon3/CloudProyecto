@@ -4,7 +4,8 @@ import os
 import app_settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from batch_model.model import Task, FileStatus, db
+from batch_model.model import Task, FileStatus, User, db
+from mail_send import MailSend
 
 
 engine = create_engine(app_settings.SQLALCHEMY_DATABASE_URI)
@@ -54,10 +55,16 @@ for pendingTask in pendingTasks:
             elif extension == ".ogg":
                 input = AudioSegment.from_ogg(originFilePath)
                 input.export(targetFilePath, format=targetExtension)
+            message = "El archivo ha sudo descargado correctamente, podrá descargarlo con el nombre " + fileName + "." + targetExtension
         except:
             valid = False
             message = "No se pudo realizar la conversión porque se presentó un error durante la covnersión, revise el formato del archivo cargado."
 
-    pendingTask.status = FileStatus.UPLOADED if valid else FileStatus.ERROR
+    pendingTask.status = FileStatus.PROCESSED if valid else FileStatus.ERROR
     session.commit()
+    mailSender = MailSend()
+    user = session.query(User).filter(User.username == pendingTask.user).first()
+    subject = "Se ha terminado la conversión del archivo " + originFileName
+    message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
+    mailSender.send_email(user.email, subject, message)
 
