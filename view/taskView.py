@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 
 from model import db, User, Task, TaskModelSchema
 from model.taskModel import FileStatus
+import app_settings
 
 taskSchema = TaskModelSchema()
 
@@ -38,7 +39,6 @@ class TaskView(Resource):
 
 
 class TasksView(Resource):
-    extensionAllowed = ["mp3", "wav", "acc", "ogg", "wmaw"]
 
     @jwt_required()
     def post(self):
@@ -49,11 +49,14 @@ class TasksView(Resource):
             fileUploaded=request.files["fileName"]
        
             fileName=secure_filename(fileUploaded.filename)
-            if(fileName.split(".")[1]in self.extensionAllowed):
+            if(fileName.split(".")[1]in app_settings.EXTENSIONES_PERMITIDAS):
                 user.tasks.append(Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED))
                 db.session.commit()
                 try:
-                    fileUploaded.save(os.path.join("uploads/uploaded", fileName))
+                    rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
+                    if not os.path.exists(rutaUsuario):
+                        os.mkdir(rutaUsuario)
+                    fileUploaded.save(os.path.join(rutaUsuario, fileName))
                 except: 
                     return "No se pudo guardar el archivo",500
                 return "Se ha creado la tarea exitosamente"

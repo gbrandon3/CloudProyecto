@@ -6,6 +6,7 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 class FileStatus(enum.Enum):
     UPLOADED = 1
     PROCESSED = 2
+    ERROR = 3
 class Task(db.Model):
     id=db.Column(db.Integer, primary_key=True,autoincrement=True)
     timestmap=db.Column(db.String(50))
