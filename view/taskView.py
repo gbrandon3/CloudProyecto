@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 
 from model import db, User, Task, TaskModelSchema
 from model.taskModel import FileStatus
+import app_settings
 
 taskSchema = TaskModelSchema()
 
@@ -35,10 +36,34 @@ class TaskView(Resource):
                 return "Tarea no encontrada",400
         else:
             return "Usuario no encontrado", 404
+    @jwt_required()
+    def put(self,id_task):
+        if request . json["newFormat"] not in app_settings . EXTENSIONES_PERMITIDAS :
+            return "Extension no permitida",400
+        identity = get_jwt_identity()
+        user = User.query.get_or_404(identity)   
+        if user is not None:
+            task=Task.query.filter(Task.id == id_task).first()
+            if task is not None:
+                if(task.status!= FileStatus.UPLOADED):
+                    ruta=os.path.join(app_settings.RUTA_REPOSITORIO,user.username)
+                    archivo=task.file.split(".")[0]+"."+task.newExtension
+                    if os.path.exists(os.path.join(ruta,archivo)):
+                        os.remove(os.path.join(os.path.join(ruta,archivo)))
+                        
+               
+                task.newExtension=request.json["newFormat"]
+                task.status=FileStatus.UPLOADED
+                db.session.commit()
+                return "Se actualizo la tarea correctamente"           
+            else:
+                return "Tarea no encontrada",400   
+            
+   
+
 
 
 class TasksView(Resource):
-    extensionAllowed = ["mp3", "wav", "acc", "ogg", "wmaw"]
 
     @jwt_required()
     def post(self):
@@ -49,11 +74,14 @@ class TasksView(Resource):
             fileUploaded=request.files["fileName"]
        
             fileName=secure_filename(fileUploaded.filename)
-            if(fileName.split(".")[1]in self.extensionAllowed):
+            if(fileName.split(".")[1]in app_settings.EXTENSIONES_PERMITIDAS):
                 user.tasks.append(Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED))
                 db.session.commit()
                 try:
-                    fileUploaded.save(os.path.join("uploads/uploaded", fileName))
+                    rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
+                    if not os.path.exists(rutaUsuario):
+                        os.mkdir(rutaUsuario)
+                    fileUploaded.save(os.path.join(rutaUsuario, fileName))
                 except: 
                     return "No se pudo guardar el archivo",500
                 return "Se ha creado la tarea exitosamente"
@@ -91,11 +119,7 @@ class TaskViewFile(Resource):
         user = User.query.get_or_404(identity)
         if user is not None:
             task = Task.query.filter(Task.user == user.username, Task.file == file_name).first()
-            print(task.status, file=sys.stderr)
-            print("Ruta:" + os.getcwd(), file=sys.stderr)
-            root = os.getcwd()
-            path = '/uploads/uploaded/' if task.status == FileStatus.UPLOADED else '/process/process/'
-            print("llego:", file=sys.stderr)
-            return send_from_directory(root + path, file_name, as_attachment=True)
+            rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
+            return send_from_directory(rutaUsuario, file_name, as_attachment=True)
         else:
             return "Usuario no encontrado", 404
