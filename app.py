@@ -6,10 +6,11 @@ from flask_restful import Api
 from flask_cors import CORS
 from model import db
 from view import SignUpView, SignInView, TaskView, TasksView, TaskViewFile
+import app_settings
 
 app = Flask(__name__)
                                                 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@postgres:5432/Cloud' # 'postgresql://usuario:contraseña@localhost:5432/Cloud' Cambiar esta linea si no se usa docker
+app.config['SQLALCHEMY_DATABASE_URI'] = app_settings.SQLALCHEMY_DATABASE_URI
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
