@@ -7,6 +7,7 @@ from flask_cors import CORS
 from model import db
 from view import SignUpView, SignInView, TaskView, TasksView, TaskViewFile
 import app_settings
+from view.convertView import ConvertView
 
 app = Flask(__name__)
                                                 
@@ -34,4 +35,5 @@ api.add_resource(SignInView, "/api/auth/signin")
 api.add_resource(TasksView, "/api/tasks")
 api.add_resource(TaskView, "/api/task/<int:id_task>")
 api.add_resource(TaskViewFile, "/api/file/<string:file_name>")
+api.add_resource(ConvertView, "/api/convert")
 jwt = JWTManager(app)
