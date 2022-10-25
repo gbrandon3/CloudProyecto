@@ -69,11 +69,14 @@ class ConvertView(Resource):
 
             pendingTask.status = FileStatus.PROCESSED if valid else FileStatus.ERROR
             db.session.commit()
-            mailSender = MailSend()
-            user = User.query.filter(User.username == pendingTask.user).first()
-            subject = "Se ha terminado la conversión del archivo " + originFileName
-            message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
-            mailSender.send_email(user.email, subject, message)
+            try:
+                mailSender = MailSend()
+                user = User.query.filter(User.username == pendingTask.user).first()
+                subject = "Se ha terminado la conversión del archivo " + originFileName
+                message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
+                mailSender.send_email(user.email, subject, message)
+            except:
+                print("No se pudo enviar el correo")
 
         return str(validTasks) + " Ok, " + str(errorTasks) + " con error"           
 
