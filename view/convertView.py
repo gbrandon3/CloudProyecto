@@ -66,6 +66,7 @@ class ConvertView(Resource):
                     valid = False
                     message = "No se pudo realizar la conversión porque se presentó un error durante la covnersión, revise el formato del archivo cargado."
                     errorTasks = errorTasks + 1
+                    print('Error al convertir el archivo: ' + message)
 
             pendingTask.status = FileStatus.PROCESSED if valid else FileStatus.ERROR
             db.session.commit()
