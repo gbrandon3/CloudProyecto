@@ -41,5 +41,5 @@ RUTA_REPOSITORIO: Directorio base donde se almacenan los archivos cargados y pro
 
 ```
 Para la ejecucion 
-En la carpeta del la aplicacion
-flask run --host=0.0.0.0 --port=5000
+En la carpeta del la aplicacion```
+flask run --host=0.0.0.0 --port=5000```
