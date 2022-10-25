@@ -29,7 +29,7 @@ Para ejecutar en shell el script de conversión, el archivo debe tener permisos 
 
 Para correr el script en pruebas, se ejecuta el siguiente comando desde la carpeta raiz del proyecto
 
-    python3 batch_conversion/convertir_audio.py 
+    python3 batch_conversion.py 
 
 ##  Configuración (app_settings.py)
 
