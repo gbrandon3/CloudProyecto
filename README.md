@@ -1,17 +1,11 @@
 # CloudProyecto
-# Ejecución del proyecto
-
-```
-docker compose up
-```
-
 
 ##  Instalación de la librería de conversión de audio (pudyb + ffmpeg )
 
 Instalar la versión v0.25.1 de pydub
 
 
-    pip install pydub
+    pip install -r requirements.txt
 
 Las instrucciones detalladas están disponibles en https://github.com/jiaaro/pydub#installation
 
