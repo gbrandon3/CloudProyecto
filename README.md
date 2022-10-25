@@ -1,16 +1,14 @@
 # CloudProyecto
 
-##  Instalación de la librería de conversión de audio (pudyb + ffmpeg )
+
 
 Instalar las librerias usadas
 
 
     pip install -r requirements.txt
 
-Las instrucciones detalladas están disponibles en https://github.com/jiaaro/pydub#installation
-
-
-Luego instalar ffmpeg
+##  Instalación de la librería de conversión de audio (pudyb + ffmpeg )
+Instalar ffmpeg
 
     apt-get install ffmpeg libavcodec-extra
 
