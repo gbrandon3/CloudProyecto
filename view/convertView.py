@@ -16,7 +16,7 @@ taskSchema = TaskModelSchema()
 
 class ConvertView(Resource):
     def get(self):
-        pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED)
+        pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED).limit(5).all()
         validTasks = 0
         errorTasks = 0
         for pendingTask in pendingTasks:
