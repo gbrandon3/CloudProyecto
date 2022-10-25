@@ -1,6 +1,7 @@
 # CloudProyecto
 
 
+El proyecto se debe correr en una maquina linux para hacer la conversion de audio
 
 Instalar las librerias usadas
 
