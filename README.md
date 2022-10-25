@@ -36,6 +36,6 @@ El archivo /app_settings.py contiene las siguientes variables de configuración,
 ```
 SQLALCHEMY_DATABASE_URI: URI de la base de datos postgres
 RUTA_REPOSITORIO: Directorio base donde se almacenan los archivos cargados y procesados
-EXTENSIONES_PERMITIDAS: Array con las extensiones permitidas para cargar, sin punto
+
 
 ```
