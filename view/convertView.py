@@ -75,5 +75,5 @@ class ConvertView(Resource):
             message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
             mailSender.send_email(user.email, subject, message)
 
-        return validTasks + " Ok, " + errorTasks + " con error"           
+        return str(validTasks) + " Ok, " + str(errorTasks) + " con error"           
 
