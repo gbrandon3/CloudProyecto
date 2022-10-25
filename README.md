@@ -2,7 +2,7 @@
 
 ##  Instalación de la librería de conversión de audio (pudyb + ffmpeg )
 
-Instalar la versión v0.25.1 de pydub
+Instalar las librerias usadas
 
 
     pip install -r requirements.txt
