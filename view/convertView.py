@@ -17,6 +17,8 @@ taskSchema = TaskModelSchema()
 class ConvertView(Resource):
     def get(self):
         pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED)
+        validTasks = 0
+        errorTasks = 0
         for pendingTask in pendingTasks:
             print(pendingTask)
             message = ""
@@ -59,9 +61,11 @@ class ConvertView(Resource):
                         input = AudioSegment.from_ogg(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
                     message = "El archivo ha sudo descargado correctamente, podrá descargarlo con el nombre " + fileName + "." + targetExtension
+                    validTasks = validTasks + 1
                 except:
                     valid = False
                     message = "No se pudo realizar la conversión porque se presentó un error durante la covnersión, revise el formato del archivo cargado."
+                    errorTasks = errorTasks + 1
 
             pendingTask.status = FileStatus.PROCESSED if valid else FileStatus.ERROR
             db.session.commit()
@@ -70,4 +74,6 @@ class ConvertView(Resource):
             subject = "Se ha terminado la conversión del archivo " + originFileName
             message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
             mailSender.send_email(user.email, subject, message)
+
+        return validTasks + " Ok, " + errorTasks + " con error"           
 
