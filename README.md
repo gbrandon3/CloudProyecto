@@ -1,22 +1,15 @@
 # CloudProyecto
-# Ejecución del proyecto
 
-```
-docker compose up
-```
 
+El proyecto se debe correr en una maquina linux para hacer la conversion de audio
+
+Instalar las librerias usadas
+
+
+    pip install -r requirements.txt
 
 ##  Instalación de la librería de conversión de audio (pudyb + ffmpeg )
-
-Instalar la versión v0.25.1 de pydub
-
-
-    pip install pydub
-
-Las instrucciones detalladas están disponibles en https://github.com/jiaaro/pydub#installation
-
-
-Luego instalar ffmpeg
+Instalar ffmpeg
 
     apt-get install ffmpeg libavcodec-extra
 
@@ -35,7 +28,7 @@ Para ejecutar en shell el script de conversión, el archivo debe tener permisos 
 
 Para correr el script en pruebas, se ejecuta el siguiente comando desde la carpeta raiz del proyecto
 
-    python3 batch_conversion/convertir_audio.py 
+    python3 batch_conversion.py 
 
 ##  Configuración (app_settings.py)
 
@@ -44,6 +37,9 @@ El archivo /app_settings.py contiene las siguientes variables de configuración,
 ```
 SQLALCHEMY_DATABASE_URI: URI de la base de datos postgres
 RUTA_REPOSITORIO: Directorio base donde se almacenan los archivos cargados y procesados
-EXTENSIONES_PERMITIDAS: Array con las extensiones permitidas para cargar, sin punto
+
 
 ```
+Para la ejecucion 
+En la carpeta del la aplicacion```
+flask run --host=0.0.0.0 --port=5000```
