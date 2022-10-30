@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 from flask_restful import Api
 from flask_cors import CORS
 from model import db
-from view import SignUpView, SignInView, TaskView, TasksView, TaskViewFile
+from view import SignUpView, SignInView
 import app_settings
 
 app = Flask(__name__)
@@ -31,7 +31,4 @@ api = Api(app)
 
 api.add_resource(SignUpView, "/api/auth/signup")
 api.add_resource(SignInView, "/api/auth/signin")
-api.add_resource(TasksView, "/api/tasks")
-api.add_resource(TaskView, "/api/task/<int:id_task>")
-api.add_resource(TaskViewFile, "/api/file/<string:file_name>")
 jwt = JWTManager(app)
