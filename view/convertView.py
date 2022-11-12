@@ -1,16 +1,16 @@
 import os
 import sys
 from datetime import datetime
+import traceback
 
 from flask_restful import Resource
 from pydub import AudioSegment
-from gcpStorage import GCPStorage
-
-from model import db, User, Task, TaskModelSchema
-from model.taskModel import FileStatus
-from mail_send import MailSend
 
 import app_settings
+from gcpStorage import GCPStorage
+from mail_send import MailSend
+from model import Task, TaskModelSchema, User, db
+from model.taskModel import FileStatus
 
 taskSchema = TaskModelSchema()
 
@@ -64,6 +64,7 @@ class ConvertView(Resource):
                     print(message)
                     validTasks = validTasks + 1
                 except Exception as e:
+                    traceback.print_exc()
                     valid = False
                     message = "No se pudo realizar la conversión porque se presentó un error durante la covnersión, revise el formato del archivo cargado. " + str(e) 
                     errorTasks = errorTasks + 1
