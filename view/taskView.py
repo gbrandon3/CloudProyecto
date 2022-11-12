@@ -1,7 +1,7 @@
 import os
 import sys
 from datetime import datetime
-
+from celery import Celery
 from flask import request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
@@ -12,8 +12,10 @@ from model.taskModel import FileStatus
 import app_settings
 
 taskSchema = TaskModelSchema()
-
-
+celery_app = Celery(__name__, broker=app_settings.MESSAGE_QUEUE_URI)
+@celery_app.task(name='convert_audio')  
+def conver_audio(*args):
+    pass
 class TaskView(Resource):
     @jwt_required()
     def get(self, id_task):
@@ -55,7 +57,7 @@ class TaskView(Resource):
                 task.newExtension=request.json["newFormat"]
                 task.status=FileStatus.UPLOADED
                 db.session.commit()
-                return "Se actualizo la tarea correctamente"           
+                return taskSchema.dump(task)           
             else:
                 return "Tarea no encontrada",400   
             
@@ -72,7 +74,7 @@ class TasksView(Resource):
         if(user!=None):
           
             fileUploaded=request.files["fileName"]
-       
+        
             fileName=secure_filename(fileUploaded.filename)
             if(fileName.split(".")[1]in app_settings.EXTENSIONES_PERMITIDAS):
                 user.tasks.append(Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED))
@@ -80,13 +82,20 @@ class TasksView(Resource):
                 try:
                     rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
                     if not os.path.exists(rutaUsuario):
+                        print("entro")
+                        if not os.path.exists(os.path.join(app_settings.RUTA_REPOSITORIO)):
+                            os.makedirs(os.path.join(app_settings.RUTA_REPOSITORIO))
                         os.mkdir(rutaUsuario)
                     fileUploaded.save(os.path.join(rutaUsuario, fileName))
-                except: 
+                    
+                except Exception as e:
+                    print(str(e)) 
+
                     return "No se pudo guardar el archivo",500
+                conver_audio.apply_async(queue="convert")    
                 return "Se ha creado la tarea exitosamente"
             else:
-                return "Archivo no valido"
+                return "Archivo no valido",400
         else:
             return "Usuario no encontrado", 404
 
