@@ -17,7 +17,7 @@ taskSchema = TaskModelSchema()
 
 class ConvertView(Resource):
     def get(self):
-        pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED).limit(5).all()
+        pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED).limit(500).all()
         validTasks = 0
         errorTasks = 0
         for pendingTask in pendingTasks:
@@ -52,15 +52,14 @@ class ConvertView(Resource):
                     if extension == ".wav":
                         input = AudioSegment.from_wav(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
-                        GCPStorage.upload_file(targetFilePath,pendingTask.user, fileName + "." + targetExtension)
                     elif extension == ".mp3":
                         input = AudioSegment.from_mp3(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
-                        GCPStorage.upload_file(targetFilePath,pendingTask.user, fileName + "." + targetExtension)
                     elif extension == ".ogg":
                         input = AudioSegment.from_ogg(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
-                        GCPStorage.upload_file(targetFilePath,pendingTask.user, fileName + "." + targetExtension)
+
+                    GCPStorage.upload_file(targetFilePath,pendingTask.user + "/" + fileName + "." + targetExtension)
                     message = "El archivo ha sudo descargado correctamente, podrá descargarlo con el nombre " + fileName + "." + targetExtension
                     validTasks = validTasks + 1
                 except Exception as e:
