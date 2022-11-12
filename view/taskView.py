@@ -5,10 +5,13 @@ from datetime import datetime
 from flask import request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
+from werkzeug import Response
 from werkzeug.utils import secure_filename
+from gcpStorage import GCPStorage
 
 from model import db, User, Task, TaskModelSchema
 from model.taskModel import FileStatus
+
 import app_settings
 
 taskSchema = TaskModelSchema()
@@ -78,12 +81,10 @@ class TasksView(Resource):
                 user.tasks.append(Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED))
                 db.session.commit()
                 try:
-                    rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
-                    if not os.path.exists(rutaUsuario):
-                        os.mkdir(rutaUsuario)
-                    fileUploaded.save(os.path.join(rutaUsuario, fileName))
-                except: 
-                    return "No se pudo guardar el archivo",500
+                    rutaArchivo = user.username + "/" + fileName
+                    GCPStorage.upload_blob(fileUploaded.stream, rutaArchivo)
+                except Exception as e: 
+                    return "No se pudo guardar el archivo " + str(e),500
                 return "Se ha creado la tarea exitosamente"
             else:
                 return "Archivo no valido"
@@ -119,7 +120,14 @@ class TaskViewFile(Resource):
         user = User.query.get_or_404(identity)
         if user is not None:
             task = Task.query.filter(Task.user == user.username, Task.file == file_name).first()
-            rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
-            return send_from_directory(rutaUsuario, file_name, as_attachment=True)
+            rutaArchivo = user.username + "/" + file_name
+            contenido = GCPStorage.download_blob(rutaArchivo)
+            mimetype="audio/wav"
+            if file_name.endswith(".mp3"):
+                mimetype = "audio/mpeg"
+            if file_name.endswith(".ogg"):
+                mimetype = "audio/ogg"
+            return Response(contenido, mimetype=mimetype)
+            #return send_from_directory(rutaUsuario, file_name, as_attachment=True)
         else:
             return "Usuario no encontrado", 404
