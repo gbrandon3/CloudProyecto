@@ -47,8 +47,8 @@ class ConvertView(Resource):
                 message = "La conversión requerida ya había sido realizada, puede descargar el archivo"
 
             if valid:
-                GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, originFilePath)
                 try:
+                    GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, originFilePath)
                     if extension == ".wav":
                         input = AudioSegment.from_wav(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
