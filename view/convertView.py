@@ -59,8 +59,9 @@ class ConvertView(Resource):
                         input = AudioSegment.from_ogg(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
 
-                    GCPStorage.upload_file(targetFilePath,pendingTask.user + "/" + fileName + "." + targetExtension)
-                    message = "El archivo ha sudo descargado correctamente, podrá descargarlo con el nombre " + fileName + "." + targetExtension
+                    GCPStorage.upload_file(targetFilePath, pendingTask.user + "/" + fileName + "." + targetExtension)
+                    message = "El archivo ha sido descargado correctamente, podrá descargarlo con el nombre " + fileName + "." + targetExtension
+                    print(message)
                     validTasks = validTasks + 1
                 except Exception as e:
                     valid = False
