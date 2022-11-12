@@ -21,7 +21,7 @@ class GCPStorage:
         storage_client = storage.Client()
         bucket = storage_client.bucket(app_settings.GCP_BUBKET_NAME)
         blob = bucket.blob(destination_blob_name)
-        blob.upload_from_file(source_file)
+        blob.upload_from_filename(source_file)
         print(
             f"File {source_file} uploaded to {destination_blob_name}."
         )
