@@ -5,17 +5,42 @@ import traceback
 
 from flask_restful import Resource
 from pydub import AudioSegment
-
+from werkzeug.utils import secure_filename
 import app_settings
 from gcpStorage import GCPStorage
 from mail_send import MailSend
 from model import Task, TaskModelSchema, User, db
 from model.taskModel import FileStatus
-
+from flask_jwt_extended import jwt_required, get_jwt_identity
 taskSchema = TaskModelSchema()
 
 
 class ConvertView(Resource):
+<<<<<<< Updated upstream
+=======
+    @jwt_required()
+    def post(self):
+        identity=get_jwt_identity()
+        user=User.query.get_or_404(identity)
+        if(user!=None):
+          
+            fileUploaded=request.files["fileName"]
+       
+            fileName=secure_filename(fileUploaded.filename)
+            if(fileName.split(".")[1]in app_settings.EXTENSIONES_PERMITIDAS):
+                user.tasks.append(Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED))
+                db.session.commit()
+                try:
+                    rutaArchivo = user.username + "/" + fileName
+                    GCPStorage.upload_blob(fileUploaded.stream, rutaArchivo)
+                except Exception as e: 
+                    return "No se pudo guardar el archivo " + str(e),500
+                return "Se ha creado la tarea exitosamente"
+            else:
+                return "Archivo no valido"
+        else:
+            return "Usuario no encontrado", 404
+>>>>>>> Stashed changes
     def get(self):
         pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED).limit(500).all()
         validTasks = 0
