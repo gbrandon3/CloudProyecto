@@ -97,8 +97,7 @@ class TasksView(Resource):
     @jwt_required()
     def get(self):
         identity = get_jwt_identity()
-        print("C")
-        testQ.apply_async(queue="convert")    
+        
         user = User.query.get_or_404(identity)
         if user != None:
             order = request.json["order"]
