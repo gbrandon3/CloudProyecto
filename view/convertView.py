@@ -16,6 +16,29 @@ taskSchema = TaskModelSchema()
 
 
 class ConvertView(Resource):
+    @jwt_required()
+    def post(self):
+        identity=get_jwt_identity()
+        user=User.query.get_or_404(identity)
+        if(user!=None):
+          
+            fileUploaded=request.files["fileName"]
+       
+            fileName=secure_filename(fileUploaded.filename)
+            if(fileName.split(".")[1]in app_settings.EXTENSIONES_PERMITIDAS):
+                user.tasks.append(Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED))
+                db.session.commit()
+                try:
+                    rutaArchivo = user.username + "/" + fileName
+                    GCPStorage.upload_blob(fileUploaded.stream, rutaArchivo)
+                except Exception as e: 
+                    return "No se pudo guardar el archivo " + str(e),
+                
+                return "Se ha creado la tarea exitosamente"
+            else:
+                return "Archivo no valido"
+        else:
+            return "Usuario no encontrado", 404
     def get(self):
         pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED).limit(500).all()
         validTasks = 0
