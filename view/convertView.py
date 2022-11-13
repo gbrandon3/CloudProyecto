@@ -16,8 +16,6 @@ taskSchema = TaskModelSchema()
 
 
 class ConvertView(Resource):
-<<<<<<< Updated upstream
-=======
     @jwt_required()
     def post(self):
         identity=get_jwt_identity()
@@ -40,7 +38,6 @@ class ConvertView(Resource):
                 return "Archivo no valido"
         else:
             return "Usuario no encontrado", 404
->>>>>>> Stashed changes
     def get(self):
         pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED).limit(500).all()
         validTasks = 0
