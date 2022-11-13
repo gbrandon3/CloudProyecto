@@ -1,22 +1,24 @@
 import os
 import sys
 from datetime import datetime
-
+from celery import Celery
 from flask import request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 from werkzeug import Response
 from werkzeug.utils import secure_filename
 from gcpStorage import GCPStorage
-
+import traceback
 from model import db, User, Task, TaskModelSchema
 from model.taskModel import FileStatus
 
 import app_settings
 
 taskSchema = TaskModelSchema()
-
-
+celery_app = Celery(__name__, broker=app_settings.MESSAGE_QUEUE_URI)
+@celery_app.task(name='convert_audio')  
+def convert_audio():
+    pass
 class TaskView(Resource):
     @jwt_required()
     def get(self, id_task):
@@ -84,7 +86,8 @@ class TasksView(Resource):
                     rutaArchivo = user.username + "/" + fileName
                     GCPStorage.upload_blob(fileUploaded.stream, rutaArchivo)
                 except Exception as e: 
-                    return "No se pudo guardar el archivo " + str(e),500
+                    return "No se pudo guardar el archivo " + str(e),
+                convert_audio.apply_async(queue="convert") 
                 return "Se ha creado la tarea exitosamente"
             else:
                 return "Archivo no valido"
@@ -94,6 +97,8 @@ class TasksView(Resource):
     @jwt_required()
     def get(self):
         identity = get_jwt_identity()
+        print("C")
+        testQ.apply_async(queue="convert")    
         user = User.query.get_or_404(identity)
         if user != None:
             order = request.json["order"]
