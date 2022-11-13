@@ -86,7 +86,7 @@ class TasksView(Resource):
                     rutaArchivo = user.username + "/" + fileName
                     GCPStorage.upload_blob(fileUploaded.stream, rutaArchivo)
                 except Exception as e: 
-                    return "No se pudo guardar el archivo " + str(e),
+                    return "No se pudo guardar el archivo " + str(e),500
                 convert_audio.apply_async(queue="convert") 
                 return "Se ha creado la tarea exitosamente"
             else:
