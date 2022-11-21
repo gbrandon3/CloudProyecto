@@ -95,7 +95,7 @@ class TasksView(Resource):
                 try:
                     publisher = pubsub_v1.PublisherClient()
                     topic_path = app_settings.PUBLISHER_PATH
-                    attr={'taskid':str(task.id)}
+                    attr={'taskId':str(task.id)}
                     data="Convertir"
                     data = data.encode('utf-8')
                     publisher.publish(topic_path, data,**attr)   
