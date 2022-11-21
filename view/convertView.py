@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 import traceback
-
+from flask import request
 from flask_restful import Resource
 from pydub import AudioSegment
 from werkzeug.utils import secure_filename
@@ -43,7 +43,7 @@ class ConvertView(Resource):
         else:
             return "Usuario no encontrado", 404
     def get(self):
-        pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED).limit(500).all()
+        pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED).limit(5)
         validTasks = 0
         errorTasks = 0
         for pendingTask in pendingTasks:
