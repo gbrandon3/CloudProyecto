@@ -1,7 +1,7 @@
 import os
 import sys
 from datetime import datetime
-
+from gcpStorage import GCPStorage
 from flask import request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
@@ -73,25 +73,17 @@ class TasksView(Resource):
         if(user!=None):
           
             fileUploaded=request.files["fileName"]
-        
+       
             fileName=secure_filename(fileUploaded.filename)
             if(fileName.split(".")[1]in app_settings.EXTENSIONES_PERMITIDAS):
                 task=Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED)
-                user.tasks.append(task)
+                user.tasks.append()
                 db.session.commit()
                 try:
-                    rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
-                    if not os.path.exists(rutaUsuario):
-                        print("entro")
-                        if not os.path.exists(os.path.join(app_settings.RUTA_REPOSITORIO)):
-                            os.makedirs(os.path.join(app_settings.RUTA_REPOSITORIO))
-                        os.mkdir(rutaUsuario)
-                    fileUploaded.save(os.path.join(rutaUsuario, fileName))
-                    
-                except Exception as e:
-                    print(str(e)) 
-
-                    return "No se pudo guardar el archivo",500
+                    rutaArchivo = user.username + "/" + fileName
+                    GCPStorage.upload_blob(fileUploaded.stream, rutaArchivo)
+                except Exception as e: 
+                    return "No se pudo guardar el archivo " + str(e),500
                 try:
                     publisher = pubsub_v1.PublisherClient()
                     topic_path = app_settings.PUBLISHER_PATH
@@ -101,14 +93,11 @@ class TasksView(Resource):
                     publisher.publish(topic_path, data,**attr)   
                 except Exception as e:
                     return 'Error: al publicar la tarea error'+ str(e),400
-            
-                publisher.publish(topic_path, data)  
                 return "Se ha creado la tarea exitosamente"
             else:
-                return "Archivo no valido",400
+                return "Archivo no valido"
         else:
-            return "Usuario no encontrado", 404
-        
+            return "Usuario no encontrado", 404    
     @jwt_required()
     def get(self):
         identity = get_jwt_identity()
