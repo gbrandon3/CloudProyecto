@@ -24,7 +24,8 @@ def convert_audio(messageP):
     try:
         
         print(messageP.attributes.get('taskId'))
-        
+        errorTasks=0
+        validTasks=0
         id=messageP.attributes.get('taskId')
         pendingTask = session.query(Task).get(int(id))
         print(pendingTask)
