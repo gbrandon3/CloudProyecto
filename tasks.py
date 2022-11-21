@@ -20,7 +20,7 @@ subscriber = pubsub_v1.SubscriberClient()
 
 sub_path=app_settings.SUB_PATH
 def convert_audio(messageP):
-    messageP.ack()
+   
     try:
         
         print(messageP.attributes.get('taskId'))
@@ -58,7 +58,7 @@ def convert_audio(messageP):
                 valid = False
                 message = "La conversión requerida ya había sido realizada, puede descargar el archivo"
                 validTasks = validTasks + 1
-            print(message)
+            print(message+"\n")
             if valid:
                 try:
                     GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, originFilePath)
@@ -74,14 +74,14 @@ def convert_audio(messageP):
 
                     GCPStorage.upload_file(targetFilePath, pendingTask.user + "/" + fileName + "." + targetExtension)
                     message = "El archivo ha sido descargado correctamente, podrá descargarlo con el nombre " + fileName + "." + targetExtension
-                    print(message)
+                    print(message+"\n")
                     validTasks = validTasks + 1
                 except Exception as e:
                     traceback.print_exc()
                     valid = False
                     message = "No se pudo realizar la conversión porque se presentó un error durante la covnersión, revise el formato del archivo cargado. " + str(e) 
                     errorTasks = errorTasks + 1
-                    print('Error al convertir el archivo: ' + message)
+                    print('Error al convertir el archivo: ' + message+"\n")
             pendingTask.status = FileStatus.PROCESSED if valid or "La conversión requerida ya había sido realizada, puede descargar el archivo" in message else FileStatus.ERROR
 
             session.commit()
@@ -92,7 +92,7 @@ def convert_audio(messageP):
                 message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
                 mailSender.send_email(user.email, subject, message)
             except Exception as e:
-                print("No se pudo enviar el correo"+str(e))
+                print("No se pudo enviar el correo"+str(e)+"\n")
 
             return str(validTasks) + " Ok, " + str(errorTasks) + " con error"           
 
