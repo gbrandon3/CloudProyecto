@@ -5,20 +5,14 @@ from celery import Celery
 from flask import request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
-from werkzeug import Response
 from werkzeug.utils import secure_filename
-from gcpStorage import GCPStorage
-import traceback
+from google.cloud import pubsub_v1
 from model import db, User, Task, TaskModelSchema
 from model.taskModel import FileStatus
-
 import app_settings
 
 taskSchema = TaskModelSchema()
-celery_app = Celery(__name__, broker=app_settings.MESSAGE_QUEUE_URI)
-@celery_app.task(name='convert_audio')  
-def convert_audio():
-    pass
+
 class TaskView(Resource):
     @jwt_required()
     def get(self, id_task):
@@ -33,7 +27,7 @@ class TaskView(Resource):
 
             if(task.first()!=None):
         
-                task.delete();
+                task.delete()
                 db.session.commit()
             
                 return "Tarea eliminada correctamente",200
@@ -60,7 +54,7 @@ class TaskView(Resource):
                 task.newExtension=request.json["newFormat"]
                 task.status=FileStatus.UPLOADED
                 db.session.commit()
-                return "Se actualizo la tarea correctamente"           
+                return taskSchema.dump(task)           
             else:
                 return "Tarea no encontrada",400   
             
@@ -77,28 +71,46 @@ class TasksView(Resource):
         if(user!=None):
           
             fileUploaded=request.files["fileName"]
-       
+        
             fileName=secure_filename(fileUploaded.filename)
             if(fileName.split(".")[1]in app_settings.EXTENSIONES_PERMITIDAS):
-                user.tasks.append(Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED))
+                task=Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED)
+                user.tasks.append(task)
                 db.session.commit()
                 try:
-                    rutaArchivo = user.username + "/" + fileName
-                    GCPStorage.upload_blob(fileUploaded.stream, rutaArchivo)
-                except Exception as e: 
-                    return "No se pudo guardar el archivo " + str(e),500
-                convert_audio.apply_async(queue="convert") 
+                    rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
+                    if not os.path.exists(rutaUsuario):
+                        print("entro")
+                        if not os.path.exists(os.path.join(app_settings.RUTA_REPOSITORIO)):
+                            os.makedirs(os.path.join(app_settings.RUTA_REPOSITORIO))
+                        os.mkdir(rutaUsuario)
+                    fileUploaded.save(os.path.join(rutaUsuario, fileName))
+                    
+                except Exception as e:
+                    print(str(e)) 
+
+                    return "No se pudo guardar el archivo",500
+                try:
+                    publisher = pubsub_v1.PublisherClient()
+                    topic_path = app_settings.PUBLISHER_PATH
+                    data = str(task.id)
+                    data = data.encode('utf-8')
+                except Exception as e:
+                    return 'Error: al publicar la tarea error'+ str(e),400
+            
+                publisher.publish(topic_path, data)  
                 return "Se ha creado la tarea exitosamente"
             else:
-                return "Archivo no valido"
+                return "Archivo no valido",400
         else:
             return "Usuario no encontrado", 404
-
+        
     @jwt_required()
     def get(self):
         identity = get_jwt_identity()
-        
         user = User.query.get_or_404(identity)
+        
+    
         if user != None:
             order = request.json["order"]
             try:
@@ -124,14 +136,7 @@ class TaskViewFile(Resource):
         user = User.query.get_or_404(identity)
         if user is not None:
             task = Task.query.filter(Task.user == user.username, Task.file == file_name).first()
-            rutaArchivo = user.username + "/" + file_name
-            contenido = GCPStorage.download_blob(rutaArchivo)
-            mimetype="audio/wav"
-            if file_name.endswith(".mp3"):
-                mimetype = "audio/mpeg"
-            if file_name.endswith(".ogg"):
-                mimetype = "audio/ogg"
-            return Response(contenido, mimetype=mimetype)
-            #return send_from_directory(rutaUsuario, file_name, as_attachment=True)
+            rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
+            return send_from_directory(rutaUsuario, file_name, as_attachment=True)
         else:
             return "Usuario no encontrado", 404
