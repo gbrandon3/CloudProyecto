@@ -37,9 +37,11 @@ El archivo /app_settings.py contiene las siguientes variables de configuración,
 ```
 SQLALCHEMY_DATABASE_URI: URI de la base de datos postgres
 RUTA_REPOSITORIO: Directorio base donde se almacenan los archivos cargados y procesados
+MESSAGE_QUEUE_URI= Uri del servidor de rabbitmq
 
 
 ```
 Para la ejecucion 
 En la carpeta del la aplicacion```
 flask run --host=0.0.0.0 --port=5000```
+Para la ejecucion de la cola de tareas ```celery -A tasks```
