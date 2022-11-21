@@ -22,6 +22,6 @@ class SignUpView(Resource):
             db.session.rollback()
             return "El usuario no pudo ser creado",409
         
-        return "Se creo el usuario orrectamente"
+        return "Se creo el usuario correctamente"
         
 
