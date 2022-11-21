@@ -8,24 +8,23 @@ from sqlalchemy.orm import sessionmaker
 from batch_model.model import Task, FileStatus, User, db
 from gcpStorage import GCPStorage
 from mail_send import MailSend
+from google.cloud import pubsub_v1
 engine = create_engine(app_settings.SQLALCHEMY_DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
 connection = engine.connect()
-celery_app = Celery(__name__, broker=app_settings.MESSAGE_QUEUE_URI)
+subscriber = pubsub_v1.SubscriberClient()
 
-  
-            
-           
-            
-@celery_app.task(name='convert_audio')  
-def convert_audio():
+sub_path=app_settings.SUB_PATH
+def convert_audio(message):
 
-    validTasks = 0
-    errorTasks = 0
-    pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED)
-
-    for pendingTask in pendingTasks:
+    #validTasks = 0
+    #errorTasks = 0
+    #pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED)
+    print(message)
+    print(message.data)
+    message.ack()
+    """for pendingTask in pendingTasks:
         message = ""
         valid = True
         originFileName = pendingTask.file
@@ -91,4 +90,12 @@ def convert_audio():
             print("No se pudo enviar el correo")
 
         return str(validTasks) + " Ok, " + str(errorTasks) + " con error"           
-           
+        """
+streaming_pull_future=subscriber.subscribe(sub_path,callback=convert_audio)
+
+with subscriber:
+    try:
+        streaming_pull_future.result()
+    except TimeoutError:
+        streaming_pull_future.cancel()
+        streaming_pull_future.result()   
