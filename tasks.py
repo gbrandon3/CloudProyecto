@@ -20,7 +20,9 @@ subscriber = pubsub_v1.SubscriberClient()
 
 sub_path=app_settings.SUB_PATH
 def convert_audio(messageP):
-    if messageP.attributes:
+    
+    try:
+        
         print(messageP.attributes.get('taskId'))
         
         id=messageP.attributes.get('taskId')
@@ -95,8 +97,8 @@ def convert_audio(messageP):
 
     
         messageP.ack()
-    else:
-        print("Error al con el subscriptor")
+    except Exception as e:
+        print("Error al con el subscriptor"+str(e))
 streaming_pull_future=subscriber.subscribe(sub_path,callback=convert_audio)
 
 with subscriber:
