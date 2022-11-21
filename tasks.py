@@ -9,6 +9,9 @@ from batch_model.model import Task, FileStatus, User, db
 from gcpStorage import GCPStorage
 from mail_send import MailSend
 from google.cloud import pubsub_v1
+crepential_path= os.getcwd()+"/"+app_settings.AUTH_PUB_SUB
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = crepential_path
 engine = create_engine(app_settings.SQLALCHEMY_DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()

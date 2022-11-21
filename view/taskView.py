@@ -10,7 +10,9 @@ from google.cloud import pubsub_v1
 from model import db, User, Task, TaskModelSchema
 from model.taskModel import FileStatus
 import app_settings
+crepential_path= os.getcwd()+"/"+app_settings.AUTH_PUB_SUB
 
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = crepential_path
 taskSchema = TaskModelSchema()
 
 class TaskView(Resource):
