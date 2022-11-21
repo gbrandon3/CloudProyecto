@@ -20,7 +20,7 @@ subscriber = pubsub_v1.SubscriberClient()
 
 sub_path=app_settings.SUB_PATH
 def convert_audio(messageP):
-    messageP.ack()
+   
     try:
         
         print(messageP.attributes.get('taskId'))
