@@ -17,7 +17,7 @@ taskSchema = TaskModelSchema()
 
 class ConvertView(Resource):
     def delete(self):
-        user=User.query().all()
+        user=User.query.all()
         for users in user:
             users.delete()
             db.session.commit()
