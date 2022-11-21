@@ -123,15 +123,7 @@ class TasksView(Resource):
                 tasks = [taskSchema.dump(task) for task in Task.query.filter(Task.user == identity).order_by(
                     Task.id.desc() if order == 1 else Task.id.asc()).all()]
                 return tasks
-        try:
-            publisher = pubsub_v1.PublisherClient()
-            topic_path = app_settings.PUBLISHER_PATH
-            data = "Prueba"
-            data = data.encode('utf-8')
-            publisher.publish(topic_path, data)   
-        except Exception as e:
-            return 'Error: al publicar la tarea error'+ str(e),400
-    
+       
 
         else:
             return "Usuario no encontrado", 404

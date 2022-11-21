@@ -24,8 +24,10 @@ def convert_audio(message):
     #validTasks = 0
     #errorTasks = 0
     #pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED)
-    print(message)
-    print(message.data)
+    
+    print(message.attributes.get('task_id'))
+
+    
     message.ack()
     """for pendingTask in pendingTasks:
         message = ""
