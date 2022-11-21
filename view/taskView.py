@@ -77,7 +77,7 @@ class TasksView(Resource):
             fileName=secure_filename(fileUploaded.filename)
             if(fileName.split(".")[1]in app_settings.EXTENSIONES_PERMITIDAS):
                 task=Task( timestmap=datetime.now(),file=fileName,newExtension=request.values.get('newFormat'),status=FileStatus.UPLOADED)
-                user.tasks.append()
+                user.tasks.append(task)
                 db.session.commit()
                 try:
                     rutaArchivo = user.username + "/" + fileName
