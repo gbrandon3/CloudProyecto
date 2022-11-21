@@ -6,16 +6,14 @@ from flask import request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
-
+from google.cloud import pubsub_v1
 from model import db, User, Task, TaskModelSchema
 from model.taskModel import FileStatus
 import app_settings
-
+credentials_path = os.getcwd() +"/"+"miso-4cloud-769393b6b084.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
 taskSchema = TaskModelSchema()
-celery_app = Celery(__name__, broker=app_settings.MESSAGE_QUEUE_URI)
-@celery_app.task(name='convert_audio')  
-def conver_audio(*args):
-    pass
+
 class TaskView(Resource):
     @jwt_required()
     def get(self, id_task):
@@ -92,17 +90,24 @@ class TasksView(Resource):
                     print(str(e)) 
 
                     return "No se pudo guardar el archivo",500
-                conver_audio.apply_async(queue="convert")    
+                publisher = pubsub_v1.PublisherClient()
+                topic_path = "projects/miso-4cloud/topics/convert"
+                data = 'Nueva task'
+                data = data.encode('utf-8')
+                
+                publisher.publish(topic_path, data)              
                 return "Se ha creado la tarea exitosamente"
             else:
                 return "Archivo no valido",400
         else:
             return "Usuario no encontrado", 404
-
+ 
     @jwt_required()
     def get(self):
         identity = get_jwt_identity()
         user = User.query.get_or_404(identity)
+        
+    
         if user != None:
             order = request.json["order"]
             try:

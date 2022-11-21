@@ -5,4 +5,4 @@ EMAIL_SERVER = "datadoc.com.co"
 EMAIL_SERVER_PORT = 587
 EMAIL_USER = "demo@datadoc.com.co"
 EMAIL_PASSWORD = "C5go2$v0"
-MESSAGE_QUEUE_URI="amqp://guest@localhost//"
+MESSAGE_QUEUE_URI="amqp://cloud:cloud@34.134.36.193//"

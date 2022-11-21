@@ -1,3 +1,5 @@
+import os 
+from google.cloud import pubsub_v1
 from pydub import AudioSegment
 from celery import Celery
 
@@ -7,19 +9,29 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from batch_model.model import Task, FileStatus, User, db
 from mail_send import MailSend
+crepential_path= os.getcwd()+"/"+"miso-4cloud-769393b6b084.json"
+print(crepential_path)
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = crepential_path
 engine = create_engine(app_settings.SQLALCHEMY_DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
 connection = engine.connect()
-celery_app = Celery(__name__, broker=app_settings.MESSAGE_QUEUE_URI)
-@celery_app.task(name='convert_audio')  
-def convert_audio():
+
+subscriber=pubsub_v1.SubscriberClient()
+sub_path='projects/miso-4cloud/subscriptions/convert-sub'
+
+def convert_audio(messagepub):
 
     validTasks = 0
     errorTasks = 0
-    pendingTasks = session.query(Task).filter(Task.status == FileStatus.UPLOADED).limit(5)
-
-    for pendingTask in pendingTasks:
+    pendingTask = session.query(Task).filter(Task.status == FileStatus.UPLOADED,).order_by(Task.id.desc()).first()
+    if(pendingTask!=None):
+        print(pendingTask.id)   
+    print(messagepub)
+    print(messagepub.data)
+      
+    
+    if(pendingTask!=None):
         message = ""
         valid = True
         originFileName = pendingTask.file
@@ -48,7 +60,7 @@ def convert_audio():
             valid = False
             message = "La conversión requerida ya había sido realizada, puede descargar el archivo"
             validTasks = validTasks + 1
-        print(message)
+       
         if valid:
            
             try:
@@ -72,11 +84,20 @@ def convert_audio():
         session.commit()
         try:
             mailSender = MailSend()
-            user = User.query.filter(User.username == pendingTask.user).first()
+            user = session.query(User).filter(User.username == pendingTask.user).first()
             subject = "Se ha terminado la conversión del archivo " + originFileName
             message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
             mailSender.send_email(user.email, subject, message)
-        except:
-            print("No se pudo enviar el correo")
+        except Exception as e :
+            print("No se pudo enviar el correo"+str(e))
 
-        return str(validTasks) + " Ok, " + str(errorTasks) + " con error"           
+        print(str(validTasks) + " Ok, " + str(errorTasks) + " con error"   )
+        messagepub.ack()    
+streaming_pull_future=subscriber.subscribe(sub_path,callback=convert_audio)
+
+with subscriber:
+    try:
+        streaming_pull_future.result()
+    except TimeoutError:
+        streaming_pull_future.cancel()
+        streaming_pull_future.result()
