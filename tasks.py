@@ -94,11 +94,12 @@ def convert_audio(messageP):
             except Exception as e:
                 print("No se pudo enviar el correo"+str(e)+"\n")
 
-            return str(validTasks) + " Ok, " + str(errorTasks) + " con error"           
+            print(str(validTasks) + " Ok, " + str(errorTasks) + " con error" )          
 
     
         messageP.ack()
     except Exception as e:
+        messageP.ack()
         print("Error al con el subscriptor"+str(e))
 streaming_pull_future=subscriber.subscribe(sub_path,callback=convert_audio)
 
