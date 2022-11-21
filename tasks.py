@@ -22,7 +22,7 @@ sub_path=app_settings.SUB_PATH
 def convert_audio(messageP):
 
     
-    pendingTask = Task.query.get(messageP.attributes.get('task_id'))
+    pendingTask = session.query(Task).get(messageP.attributes.get('task_id'))
     if(pendingTask!=None):
         message = ""
         valid = True
@@ -81,7 +81,7 @@ def convert_audio(messageP):
         session.commit()
         try:
             mailSender = MailSend()
-            user = User.query.filter(User.username == pendingTask.user).first()
+            user = session.query(User).filter(User.username == pendingTask.user).first()
             subject = "Se ha terminado la conversión del archivo " + originFileName
             message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
             mailSender.send_email(user.email, subject, message)
