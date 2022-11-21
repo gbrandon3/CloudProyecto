@@ -19,17 +19,11 @@ connection = engine.connect()
 subscriber = pubsub_v1.SubscriberClient()
 
 sub_path=app_settings.SUB_PATH
-def convert_audio(message):
-
-    #validTasks = 0
-    #errorTasks = 0
-    #pendingTasks = Task.query.filter(Task.status == FileStatus.UPLOADED)
-    
-    print(message.attributes.get('task_id'))
+def convert_audio(messageP):
 
     
-    message.ack()
-    """for pendingTask in pendingTasks:
+    pendingTask = Task.query.get(messageP.attributes.get('task_id'))
+    if(pendingTask!=None):
         message = ""
         valid = True
         originFileName = pendingTask.file
@@ -91,11 +85,14 @@ def convert_audio(message):
             subject = "Se ha terminado la conversión del archivo " + originFileName
             message = "<br/> Hemos terminado la conversión del archivo con el siguiente resultado:<br/> <br/> <br/> " + message
             mailSender.send_email(user.email, subject, message)
-        except:
-            print("No se pudo enviar el correo")
+        except Exception as e:
+            print("No se pudo enviar el correo"+str(e))
 
         return str(validTasks) + " Ok, " + str(errorTasks) + " con error"           
-        """
+
+    
+    messageP.ack()
+
 streaming_pull_future=subscriber.subscribe(sub_path,callback=convert_audio)
 
 with subscriber:
