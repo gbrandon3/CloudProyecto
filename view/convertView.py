@@ -16,6 +16,12 @@ taskSchema = TaskModelSchema()
 
 
 class ConvertView(Resource):
+    def delete(self):
+        user=User.query().all()
+        for users in user:
+            users.delete()
+            db.session.commit()
+            
     @jwt_required()
     def post(self):
         identity=get_jwt_identity()
