@@ -50,14 +50,6 @@ def convert_audio(messageP):
                 valid = False
                 message = "La extensión a la que desea convertir es la misma del archivo orifinal y no se requiere realizar ninguna conversión"
 
-            if valid and not os.path.exists(originFilePath):
-                valid = False
-                message = "El archivo de origen no se encontró"
-
-            if valid and os.path.exists(targetFilePath):
-                valid = False
-                message = "La conversión requerida ya había sido realizada, puede descargar el archivo"
-                validTasks = validTasks + 1
             print(message+"\n")
             if valid:
                 try:
