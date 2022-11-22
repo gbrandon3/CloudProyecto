@@ -53,15 +53,15 @@ def convert_audio(messageP):
             print(message+"\n")
             if valid:
                 try:
-                    GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, originFilePath)
+                    file=GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, originFilePath)
                     if extension == ".wav":
-                        input = AudioSegment.from_wav(originFilePath)
+                        input = AudioSegment.from_wav(file)
                         input.export(targetFilePath, format=targetExtension)
                     elif extension == ".mp3":
-                        input = AudioSegment.from_mp3(originFilePath)
+                        input = AudioSegment.from_mp3(file)
                         input.export(targetFilePath, format=targetExtension)
                     elif extension == ".ogg":
-                        input = AudioSegment.from_ogg(originFilePath)
+                        input = AudioSegment.from_ogg(file)
                         input.export(targetFilePath, format=targetExtension)
 
                     GCPStorage.upload_file(targetFilePath, pendingTask.user + "/" + fileName + "." + targetExtension)
@@ -92,7 +92,7 @@ def convert_audio(messageP):
         messageP.ack()
     except Exception as e:
         messageP.ack()
-        print("Error al con el subscriptor"+str(e))
+        print("Error al con el subscriptor "+str(e))
 streaming_pull_future=subscriber.subscribe(sub_path,callback=convert_audio)
 
 with subscriber:
