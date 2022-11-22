@@ -42,6 +42,8 @@ MESSAGE_QUEUE_URI= Uri del servidor de rabbitmq
 
 ```
 Para la ejecucion 
-En la carpeta del la aplicacion```
-flask run --host=0.0.0.0 --port=5000```
-Para la ejecucion de la cola de tareas ```celery -A tasks```
+aplicacion flask run
+En la carpeta del la aplicacion
+
+Para la ejecucion de la cola de tareas  de pub/sub se debe crear un servicio en gcp, generar una cuenta de acceso y crear un archivo para los permisos, modificar las variables PUBLISHER_PATH por el topic SUB_PATH por la subscripcion y  UTH_PUB_SUB por el archvio descargado que contiene los permisos, luego ejecutar el script tasks.py
+
