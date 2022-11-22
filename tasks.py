@@ -53,7 +53,7 @@ def convert_audio(messageP):
             print(message+"\n")
             if valid:
                 try:
-                    file=GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, originFilePath)
+                    file=GCPStorage.download_file("/"+pendingTask.user + "/" + pendingTask.file, originFilePath)
                     if extension == ".wav":
                         input = AudioSegment.from_wav(file)
                         input.export(targetFilePath, format=targetExtension)
