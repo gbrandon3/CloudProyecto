@@ -63,7 +63,7 @@ def convert_audio(messageP):
                     elif extension == ".ogg":
                         input = AudioSegment.from_ogg(file)
                         input.export(targetFilePath, format=targetExtension)
-
+                    
                     GCPStorage.upload_file(targetFilePath, pendingTask.user + "/" + fileName + "." + targetExtension)
                     message = "El archivo ha sido descargado correctamente, podrá descargarlo con el nombre " + fileName + "." + targetExtension
                     print(message+"\n")
