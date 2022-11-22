@@ -35,7 +35,7 @@ def convert_audio(messageP):
             originFileName = pendingTask.file
             targetExtension = pendingTask.newExtension
             fileName, extension = os.path.splitext(originFileName)
-            originFilePath = os.path.join(pendingTask.user, originFileName)
+            originFilePath = os.path.join(app_settings.RUTA_REPOSITORIO, pendingTask.user, originFileName)
             targetFilePath = os.path.join(app_settings.RUTA_REPOSITORIO, pendingTask.user, fileName + "." + targetExtension)
     
             if not targetExtension in app_settings.EXTENSIONES_PERMITIDAS:
@@ -53,15 +53,15 @@ def convert_audio(messageP):
             print(message+"\n")
             if valid:
                 try:
-                    file=GCPStorage.download_file("/"+pendingTask.user + "/" + pendingTask.file, originFilePath)
+                    GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, originFilePath)
                     if extension == ".wav":
-                        input = AudioSegment.from_wav(file)
+                        input = AudioSegment.from_wav(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
                     elif extension == ".mp3":
-                        input = AudioSegment.from_mp3(file)
+                        input = AudioSegment.from_mp3(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
                     elif extension == ".ogg":
-                        input = AudioSegment.from_ogg(file)
+                        input = AudioSegment.from_ogg(originFilePath)
                         input.export(targetFilePath, format=targetExtension)
                     
                     GCPStorage.upload_file(targetFilePath, pendingTask.user + "/" + fileName + "." + targetExtension)
