@@ -55,7 +55,7 @@ def convert_audio(messageP):
                 try:
                     print("/" + pendingTask.user + "/" + pendingTask.file + " > " + originFilePath)
                     print(targetFilePath)
-                    if(not os.path.exists(app_settings.RUTA_REPOSITORIO,pendingTask.user)):
+                    if(not os.path.exists(os.path.join(app_settings.RUTA_REPOSITORIO,pendingTask.user))):
                         os.mkdir(app_settings.RUTA_REPOSITORIO,pendingTask.user)
                     tempFile = os.path.join(app_settings.RUTA_REPOSITORIO,pendingTask.user, pendingTask.file)
                     GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, tempFile)
