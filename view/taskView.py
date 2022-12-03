@@ -6,6 +6,7 @@ from flask import request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
+from werkzeug import Response
 from google.cloud import pubsub_v1
 from model import db, User, Task, TaskModelSchema
 from model.taskModel import FileStatus
@@ -15,7 +16,7 @@ crepential_path= os.getcwd()+"/"+app_settings.AUTH_PUB_SUB
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = crepential_path
 taskSchema = TaskModelSchema()
 
-class TaskView(Resource):
+class TaskView( Resource):
     @jwt_required()
     def get(self, id_task):
         return taskSchema.dump(Task.query.get_or_404(id_task))
@@ -127,8 +128,13 @@ class TaskViewFile(Resource):
         identity = get_jwt_identity()
         user = User.query.get_or_404(identity)
         if user is not None:
-            task = Task.query.filter(Task.user == user.username, Task.file == file_name).first()
-            rutaUsuario = os.path.join(app_settings.RUTA_REPOSITORIO, user.username)
-            return send_from_directory(rutaUsuario, file_name, as_attachment=True)
+            rutaArchivo = user.username + "/" + file_name
+            contenido = GCPStorage.download_blob(rutaArchivo)
+            mimetype="audio/wav"
+            if file_name.endswith(".mp3"):
+                mimetype = "audio/mpeg"
+            if file_name.endswith(".ogg"):
+                mimetype = "audio/ogg"
+            return Response(contenido, mimetype=mimetype)
         else:
             return "Usuario no encontrado", 404
