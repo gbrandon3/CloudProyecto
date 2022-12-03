@@ -56,6 +56,15 @@ class TaskView( Resource):
                
                 task.newExtension=request.json["newFormat"]
                 task.status=FileStatus.UPLOADED
+                try:
+                    publisher = pubsub_v1.PublisherClient()
+                    topic_path = app_settings.PUBLISHER_PATH
+                    attr={'taskId':str(task.id)}
+                    data="Convertir"
+                    data = data.encode('utf-8')
+                    publisher.publish(topic_path, data,**attr)   
+                except Exception as e:
+                    return 'Error: al publicar la tarea error'+ str(e),400
                 db.session.commit()
                 return taskSchema.dump(task)           
             else:
