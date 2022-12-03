@@ -36,7 +36,7 @@ def convert_audio(messageP):
             targetExtension = pendingTask.newExtension
             fileName, extension = os.path.splitext(originFileName)
             originFilePath = os.path.join(pendingTask.user, originFileName)
-            targetFilePath = os.path.join(app_settings.RUTA_REPOSITORIO, fileName + "." + targetExtension)
+            targetFilePath = os.path.join(app_settings.RUTA_REPOSITORIO,pendingTask.user, fileName + "." + targetExtension)
     
             if not targetExtension in app_settings.EXTENSIONES_PERMITIDAS:
                 valid = False
