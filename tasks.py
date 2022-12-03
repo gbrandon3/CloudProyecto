@@ -56,7 +56,7 @@ def convert_audio(messageP):
                     print("/" + pendingTask.user + "/" + pendingTask.file + " > " + originFilePath)
                     print(targetFilePath)
                     if(not os.path.exists(os.path.join(app_settings.RUTA_REPOSITORIO,pendingTask.user))):
-                        os.mkdir(app_settings.RUTA_REPOSITORIO,pendingTask.user)
+                        os.mkdir(os.path.join(app_settings.RUTA_REPOSITORIO,pendingTask.user))
                     tempFile = os.path.join(app_settings.RUTA_REPOSITORIO,pendingTask.user, pendingTask.file)
                     GCPStorage.download_file(pendingTask.user + "/" + pendingTask.file, tempFile)
                     if extension == ".wav":
