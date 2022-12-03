@@ -1,5 +1,4 @@
 from pydub import AudioSegment
-from celery import Celery
 import traceback
 import os
 import app_settings
