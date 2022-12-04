@@ -113,21 +113,27 @@ class TasksView(Resource):
         identity = get_jwt_identity()
         user = User.query.get_or_404(identity)
         
+    
         if user != None:
-            order = request.json["order"]
+            order = int(request.args.get('order')) 
+        
             try:
-                cantMax = request.json["max"]
+                cantMax = int(request.args.get('max'))
+             
                 tasks = Task.query.filter(Task.user == identity).order_by(
                     Task.id.desc() if order == 1 else Task.id.asc()).limit(cantMax)
                 return [taskSchema.dump(task) for task in tasks]
-            except KeyError:
+        
+            except Exception:
                 tasks = [taskSchema.dump(task) for task in Task.query.filter(Task.user == identity).order_by(
                     Task.id.desc() if order == 1 else Task.id.asc()).all()]
                 return tasks
-    
+
 
         else:
             return "Usuario no encontrado", 404
+
+
 
 
 class TaskViewFile(Resource):
