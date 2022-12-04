@@ -1,6 +1,8 @@
-runtime: custom
+runtime: python
 
 env: flex
+
+entrypoint: gunicorn -b :$PORT app:app
 
 env_variables:
   PROJECT_ID: 'miso-4cloud'
@@ -13,4 +15,4 @@ automatic_scaling:
   min_num_instances: 1
   max_num_instances: 3
 
-service: worker
+service: apiconvert
