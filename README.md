@@ -2,7 +2,7 @@
 # Despliegue en app engine
 Cambiar la el proyect_id de ambos archivos y ejecutar el comando 
 ```
-gcloud app deploy api.yaml worker.yaml
+gcloud app deploy —project api.yaml worker.yaml 
 ```
 # Instalacion local
 El proyecto se debe correr en una maquina linux para hacer la conversion de audio
